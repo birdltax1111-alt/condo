@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบดูข้อมูลนิติกรรมห้องชุด</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+  :root {
+    --bg:#f4f2ee; --surface:#fff; --surface2:#f9f8f5;
+    --border:#e2ddd6; --border2:#ccc8bf;
+    --text1:#1a1816; --text2:#5c5750; --text3:#9e9890;
+    --accent:#2a5f8f; --accent-light:#ddeaf6;
+    --sell:#2d6a2d; --sell-bg:#e6f3e6;
+    --mort:#7a4a00; --mort-bg:#fef3e0;
+    --redb:#1a4e7a; --redb-bg:#ddeaf6;
+    --radius:10px; --radius-sm:6px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text1);min-height:100vh}
+
+  /* Header */
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-icon{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px}
+  .logo-text{font-size:15px;font-weight:600}
+  .logo-sub{font-size:12px;color:var(--text2);font-weight:400}
+  .btn-import{display:flex;align-items:center;gap:6px;padding:7px 16px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+  .btn-import:hover{background:#1e4e78}
+
+  /* Layout */
+  .layout{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 60px)}
+
+  /* Sidebar */
+  aside{background:var(--surface);border-right:1px solid var(--border);padding:1.25rem;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+  .sidebar-section{margin-bottom:1.5rem}
+  .sidebar-label{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+  .search-wrap{position:relative}
+  .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:15px;pointer-events:none}
+  input[type="text"]{width:100%;height:36px;padding:0 10px 0 32px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:'Sarabun',sans-serif;font-size:14px;background:var(--surface2);color:var(--text1);outline:none;transition:border-color .15s}
+  input[type="text"]:focus{border-color:var(--accent);background:white}
+  .filter-group{display:flex;flex-direction:column;gap:6px}
+  .filter-btn{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid transparent;background:transparent;font-family:'Sarabun',sans-serif;font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s;text-align:left;width:100%}
+  .filter-btn:hover{background:var(--surface2);color:var(--text1)}
+  .filter-btn.active{background:var(--accent-light);border-color:#b5ceea;color:var(--accent);font-weight:600}
+  .filter-count{background:var(--bg);border-radius:20px;padding:1px 8px;font-size:11px;color:var(--text3);flex-shrink:0}
+  .filter-btn.active .filter-count{background:#c8dff0;color:var(--accent)}
+  .stat-mini{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;text-align:center}
+  .stat-num{font-size:22px;font-weight:700;line-height:1;margin-bottom:3px}
+  .stat-lbl{font-size:11px;color:var(--text2)}
+
+  /* Main */
+  main{padding:1.25rem 1.5rem;overflow-y:auto}
+  .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+  .toolbar-left{font-size:13px;color:var(--text2)}
+  .toolbar-left strong{color:var(--text1);font-weight:600}
+  .sort-wrap{display:flex;align-items:center;gap:6px}
+  .sort-wrap label{font-size:12px;color:var(--text2)}
+  select{height:30px;padding:0 8px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:'Sarabun',sans-serif;font-size:12px;background:white;color:var(--text1);outline:none;cursor:pointer}
+
+  /* Cards */
+  #list{display:flex;flex-direction:column;gap:8px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:box-shadow .2s,border-color .2s;cursor:pointer}
+  .card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);border-color:var(--border2)}
+  .card.open{border-color:#c4d8ee}
+  .card-head{display:flex;align-items:center;padding:13px 16px;gap:12px}
+  .room-pill{background:var(--accent-light);color:var(--accent);border-radius:var(--radius-sm);padding:5px 12px;font-size:14px;font-weight:600;white-space:nowrap;min-width:80px;text-align:center}
+  .card-info{flex:1;min-width:0}
+  .card-name{font-size:15px;font-weight:600;margin-bottom:2px}
+  .card-meta{font-size:12px;color:var(--text2);display:flex;gap:10px;flex-wrap:wrap}
+  .card-meta span::before{content:"·";margin-right:4px;color:var(--text3)}
+  .card-meta span:first-child::before{display:none}
+  .card-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .type-badge{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+  .sell{background:var(--sell-bg);color:var(--sell)}
+  .mort{background:var(--mort-bg);color:var(--mort)}
+  .redeem{background:var(--redb-bg);color:var(--redb)}
+  .card-amt{font-size:15px;font-weight:700;white-space:nowrap}
+  .card-date{font-size:11px;color:var(--text3);text-align:right}
+  .chevron{color:var(--text3);font-size:14px;transition:transform .2s}
+  .card.open .chevron{transform:rotate(180deg)}
+  .detail{display:none;border-top:1px solid var(--border);background:var(--surface2)}
+  .card.open .detail{display:grid;grid-template-columns:1fr 1fr 1fr}
+  .detail-col{padding:14px 16px;border-right:1px solid var(--border)}
+  .detail-col:last-child{border-right:none}
+  .detail-title{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px}
+  .row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:13px;border-bottom:1px solid var(--border)}
+  .row:last-child{border-bottom:none}
+  .row-label{color:var(--text2);flex-shrink:0;margin-right:8px}
+  .row-val{color:var(--text1);font-weight:500;text-align:right;word-break:break-word}
+  .id-text{font-family:monospace;font-size:12px;letter-spacing:.03em}
+  .empty{text-align:center;padding:3rem;color:var(--text3);font-size:14px}
+
+  /* ── Import Modal ── */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s}
+  .modal-backdrop.show{opacity:1;pointer-events:all}
+  .modal{background:white;border-radius:14px;width:520px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2);transform:translateY(12px);transition:transform .2s;overflow:hidden}
+  .modal-backdrop.show .modal{transform:translateY(0)}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)}
+  .modal-title{font-size:16px;font-weight:700}
+  .btn-close{width:28px;height:28px;border:none;background:var(--surface2);border-radius:50%;font-size:16px;cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:background .15s;line-height:1}
+  .btn-close:hover{background:var(--border)}
+  .modal-body{padding:20px}
+
+  /* Drop zone */
+  .drop-zone{border:2px dashed var(--border2);border-radius:10px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2)}
+  .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:var(--accent-light)}
+  .drop-zone .dz-icon{font-size:42px;margin-bottom:10px}
+  .drop-zone .dz-title{font-size:15px;font-weight:600;margin-bottom:4px}
+  .drop-zone .dz-sub{font-size:12px;color:var(--text2)}
+  .drop-zone input[type="file"]{display:none}
+
+  /* File info */
+  .file-info{display:none;margin-top:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;align-items:center;gap:10px}
+  .file-info.show{display:flex}
+  .file-icon{font-size:22px}
+  .file-name{flex:1;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .file-size{font-size:12px;color:var(--text2);flex-shrink:0}
+  .btn-clr{background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;padding:0 2px;line-height:1;transition:color .15s}
+  .btn-clr:hover{color:#c0392b}
+
+  /* Preview */
+  .preview-wrap{display:none;margin-top:12px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden}
+  .preview-wrap.show{display:block}
+  .preview-hdr{background:var(--surface2);padding:8px 12px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+  .preview-hdr strong{color:var(--text1)}
+  .preview-scroll{overflow-x:auto;max-height:180px;overflow-y:auto}
+  .ptable{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+  .ptable th{background:#f0ede8;padding:6px 10px;text-align:left;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);position:sticky;top:0}
+  .ptable td{padding:5px 10px;border-bottom:1px solid var(--border);max-width:160px;overflow:hidden;text-overflow:ellipsis}
+  .ptable tr:last-child td{border-bottom:none}
+
+  /* Msg */
+  .imp-msg{display:none;margin-top:10px;padding:9px 13px;border-radius:var(--radius-sm);font-size:13px}
+  .imp-msg.err{display:block;background:#fde8e8;color:#a02020;border:1px solid #f5c0c0}
+  .imp-msg.warn{display:block;background:#fff8e1;color:#7a5a00;border:1px solid #f5dfa0}
+  .imp-msg.ok{display:block;background:#e8f5e9;color:#2a6a2a;border:1px solid #b5d9b5}
+
+  /* Footer */
+  .modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--border);background:var(--surface2)}
+  .btn-cancel{padding:8px 18px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:white;font-family:'Sarabun',sans-serif;font-size:13px;cursor:pointer;color:var(--text2);transition:background .15s}
+  .btn-cancel:hover{background:var(--surface2)}
+  .btn-ok{padding:8px 20px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:white;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+  .btn-ok:hover{background:#1e4e78}
+  .btn-ok:disabled{background:var(--border2);cursor:not-allowed}
+
+  /* Toast */
+  .toast{position:fixed;bottom:24px;right:24px;background:#1a1816;color:white;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999}
+  .toast.show{opacity:1;transform:translateY(0)}
+
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+  @media(max-width:768px){
+    .layout{grid-template-columns:1fr}
+    aside{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+    .card.open .detail{grid-template-columns:1fr}
+    .detail-col{border-right:none;border-bottom:1px solid var(--border)}
+    .logo-sub{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🏢</div>
+    <div>
+      <div class="logo-text">ระบบข้อมูลนิติกรรมห้องชุด</div>
+      <div class="logo-sub" id="headerSub">บ้านเอื้ออาทร กระทุ่มแบน · สมุทรสาคร</div>
+    </div>
+  </div>
+  <button class="btn-import" onclick="openImport()">📂 นำเข้าข้อมูล CSV</button>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">ค้นหา</div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="ชื่อ, เลขห้อง, อาคาร..." oninput="render()">
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">ประเภทนิติกรรม</div>
+      <div class="filter-group" id="typeFilters"></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">โครงการ</div>
+      <div class="filter-group" id="condoFilters"></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">สรุปมูลค่า</div>
+      <div class="stat-mini">
+        <div class="stat-card"><div class="stat-num" id="sumAmt">—</div><div class="stat-lbl">รวม (ล้านบาท)</div></div>
+        <div class="stat-card"><div class="stat-num" id="avgAmt">—</div><div class="stat-lbl">เฉลี่ย (บาท)</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <div class="toolbar-left">แสดง <strong id="showCount">0</strong> จาก <strong id="totalCount">0</strong> รายการ</div>
+      <div class="sort-wrap">
+        <label>เรียงตาม</label>
+        <select id="sortBy" onchange="render()">
+          <option value="date">วันที่</option>
+          <option value="amt-desc">มูลค่า มากไปน้อย</option>
+          <option value="amt-asc">มูลค่า น้อยไปมาก</option>
+          <option value="name">ชื่อเจ้าของ</option>
+        </select>
+      </div>
+    </div>
+    <div id="list"></div>
+  </main>
+</div>
+
+<!-- ── Import Modal ── -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="backdropClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📂 นำเข้าข้อมูล CSV</div>
+      <button class="btn-close" onclick="closeImport()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Drop zone -->
+      <div class="drop-zone" id="dropZone"
+           onclick="document.getElementById('fileInput').click()"
+           ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+        <div class="dz-icon">📄</div>
+        <div class="dz-title">คลิกเพื่อเลือกไฟล์ หรือลากมาวางที่นี่</div>
+        <div class="dz-sub">รองรับไฟล์ .csv (คั่นด้วย | หรือ ,)</div>
+        <input type="file" id="fileInput" accept=".csv,.txt" onchange="onFileSelect(event)">
+      </div>
+
+      <!-- File info bar -->
+      <div class="file-info" id="fileInfo">
+        <span class="file-icon">📄</span>
+        <span class="file-name" id="fileName">—</span>
+        <span class="file-size" id="fileSize"></span>
+        <button class="btn-clr" onclick="clearFile()" title="ลบ">✕</button>
+      </div>
+
+      <!-- Preview table -->
+      <div class="preview-wrap" id="previewWrap">
+        <div class="preview-hdr">
+          ตัวอย่างข้อมูล (5 แถวแรก) · <strong id="previewCols">0</strong> คอลัมน์ · <strong id="previewRows">0</strong> แถว
+        </div>
+        <div class="preview-scroll">
+          <table class="ptable" id="previewTable"></table>
+        </div>
+      </div>
+
+      <!-- Status message -->
+      <div class="imp-msg" id="impMsg"></div>
+
+      <!-- Format hint -->
+      <div style="margin-top:12px;padding:10px 13px;background:#f8f6f0;border-radius:var(--radius-sm);font-size:12px;color:var(--text2);line-height:1.6">
+        <strong style="color:var(--text1)">คอลัมน์ที่ต้องการ:</strong>
+        CONDO_NAME, ROOM_NO, OWN_FNAME, OWN_LNAME, REG_CODE, REG_AMT<br>
+        <strong style="color:var(--text1)">ตัวคั่น:</strong> | (pipe) หรือ , (comma) — ตรวจจับอัตโนมัติ
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeImport()">ยกเลิก</button>
+      <button class="btn-ok" id="btnOk" disabled onclick="confirmImport()">✔ นำเข้าข้อมูล</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══ DATA ══ */
+let DATA = [
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"38",floor:"3",room:"128/20",area:"32.42",ownTitle:"นางสาว",ownFname:"ลุน",ownLname:"กิ่งป้อง",ownId:"2331000003900",ownHse:"61",ownMoo:"14",ownSoi:"",ownRoad:"",ownTambol:"ก้านเหลือง",ownAmphur:"อุทุมพรพิสัย",ownProv:"ศรีสะเกษ",ownTel:"",regCode:"ไถ่ถอนจากจำนอง",regDate:"02/03/2569",regAmt:387000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"41",floor:"4",room:"131/32",area:"32.42",ownTitle:"นาย",ownFname:"สายัณห์",ownLname:"บัณฑิตานุกูล",ownId:"1101800504001",ownHse:"59/41",ownMoo:"",ownSoi:"ราชพฤกษ์ 9",ownRoad:"",ownTambol:"บางเชือกหนัง",ownAmphur:"ตลิ่งชัน",ownProv:"กรุงเทพมหานคร",ownTel:"",regCode:"ขาย",regDate:"06/03/2569",regAmt:300000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"35",floor:"2",room:"125/12",area:"32.42",ownTitle:"นางสาว",ownFname:"วราภรณ์",ownLname:"แย้มผกา",ownId:"3102100513170",ownHse:"85",ownMoo:"",ownSoi:"พระรามที่ 2 ซอย 44 แยก 3",ownRoad:"",ownTambol:"ท่าข้าม",ownAmphur:"บางขุนเทียน",ownProv:"กรุงเทพมหานคร",ownTel:"",regCode:"ไถ่ถอนจากจำนอง",regDate:"10/03/2569",regAmt:387000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"42",floor:"2",room:"132/10",area:"32.42",ownTitle:"นางสาว",ownFname:"พนิดา",ownLname:"แดงสกล",ownId:"3860300050655",ownHse:"182",ownMoo:"",ownSoi:"เพชรเกษม 53",ownRoad:"",ownTambol:"หลักสอง",ownAmphur:"บางแค",ownProv:"กรุงเทพมหานคร",ownTel:"",regCode:"จำนอง",regDate:"13/03/2569",regAmt:509000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"30",floor:"1",room:"120/3",area:"32.42",ownTitle:"นางสาว",ownFname:"พนิดา",ownLname:"แดงสกล",ownId:"3860300050655",ownHse:"182",ownMoo:"",ownSoi:"เพชรเกษม 53",ownRoad:"",ownTambol:"หลักสอง",ownAmphur:"บางแค",ownProv:"กรุงเทพมหานคร",ownTel:"",regCode:"ขาย",regDate:"17/03/2569",regAmt:438000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"32",floor:"2",room:"122/16",area:"32.42",ownTitle:"นางสาว",ownFname:"จันทนา",ownLname:"สายทอง",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ขาย",regDate:"17/03/2569",regAmt:452838},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"48",floor:"3",room:"138/20",area:"32.42",ownTitle:"นาย",ownFname:"ดำรงศักดิ์",ownLname:"สมคิด",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ขาย",regDate:"17/03/2569",regAmt:440818},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"48",floor:"3",room:"138/20",area:"32.42",ownTitle:"นาย",ownFname:"ดำรงศักดิ์",ownLname:"สมคิด",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ขาย",regDate:"17/03/2569",regAmt:450000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 1",bld:"20",floor:"3",room:"110/23",area:"32.36",ownTitle:"นาย",ownFname:"ยอดพล",ownLname:"อินทร์ทอง",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ขาย",regDate:"26/03/2569",regAmt:679000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 1",bld:"20",floor:"3",room:"110/23",area:"32.36",ownTitle:"นาย",ownFname:"ยอดพล",ownLname:"อินทร์ทอง",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"จำนอง",regDate:"26/03/2569",regAmt:712773},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 1",bld:"12",floor:"2",room:"102/11",area:"32.36",ownTitle:"นาย",ownFname:"กันต์พิพัฒน์",ownLname:"พวงประเสริฐ",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ไถ่ถอนจากจำนอง",regDate:"30/03/2569",regAmt:451000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 1",bld:"12",floor:"2",room:"102/11",area:"32.36",ownTitle:"นาย",ownFname:"กันต์พิพัฒน์",ownLname:"พวงประเสริฐ",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ขาย",regDate:"30/03/2569",regAmt:380000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 1",bld:"5",floor:"1",room:"94/7",area:"32.36",ownTitle:"นาย",ownFname:"จิรวัฒน์",ownLname:"กุศลสุข",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ไถ่ถอนจากจำนอง",regDate:"30/03/2569",regAmt:456000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 1",bld:"5",floor:"1",room:"94/7",area:"32.36",ownTitle:"นาย",ownFname:"จิรวัฒน์",ownLname:"กุศลสุข",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ขาย",regDate:"30/03/2569",regAmt:440000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 1",bld:"5",floor:"1",room:"94/7",area:"32.36",ownTitle:"นาย",ownFname:"จิรวัฒน์",ownLname:"กุศลสุข",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"จำนอง",regDate:"30/03/2569",regAmt:473000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"34",floor:"4",room:"124/35",area:"32.42",ownTitle:"นางสาว",ownFname:"วิกานดา",ownLname:"พรหมชนะ",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ไถ่ถอนจากจำนอง",regDate:"30/03/2569",regAmt:425000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"34",floor:"4",room:"124/35",area:"32.42",ownTitle:"นางสาว",ownFname:"วิกานดา",ownLname:"พรหมชนะ",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ขาย",regDate:"30/03/2569",regAmt:340000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"47",floor:"5",room:"137/42",area:"32.42",ownTitle:"นางสาว",ownFname:"นิภาวัลย์",ownLname:"จำชาติ",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"ขาย",regDate:"31/03/2569",regAmt:599000},
+  {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"47",floor:"5",room:"137/42",area:"32.42",ownTitle:"นางสาว",ownFname:"นิภาวัลย์",ownLname:"จำชาติ",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"จำนอง",regDate:"31/03/2569",regAmt:618337},
+];
+
+let activeType="", activeCondo="", openIdx=-1, pendingData=null;
+
+/* ══ Column mapping ══ */
+const COL_MAP = {
+  CONDO_NAME:'condo', BLD_NAME:'bld', FLOOR_NO:'floor', ROOM_NO:'room',
+  AREA:'area', OWN_TITLE:'ownTitle', OWN_FNAME:'ownFname', OWN_LNAME:'ownLname',
+  OWN_PERS_ID:'ownId', OWN_HSE_NO:'ownHse', OWN_MOO:'ownMoo', OWN_SOI:'ownSoi',
+  OWN_ROAD:'ownRoad', OWN_TAMBOL:'ownTambol', OWN_AMPHUR:'ownAmphur',
+  OWN_PROVINCE:'ownProv', OWN_TEL:'ownTel',
+  REG_CODE:'regCode', REG_DATE:'regDate', REG_AMT:'regAmt'
+};
+const REQUIRED = ['CONDO_NAME','ROOM_NO','OWN_FNAME','OWN_LNAME','REG_CODE','REG_AMT'];
+
+/* ══ Helpers ══ */
+function fmt(n)  { return Number(n).toLocaleString('th-TH',{maximumFractionDigits:0}); }
+function fmtM(n) { return (n/1000000).toFixed(2); }
+function addr(d) {
+  return [d.ownHse, d.ownMoo?"หมู่ "+d.ownMoo:"", d.ownSoi?"ซอย "+d.ownSoi:"",
+          d.ownRoad, d.ownTambol, d.ownAmphur, d.ownProv]
+    .filter(x=>x&&String(x).trim()).join(" ") || "—";
+}
+function tcls(c){ return c==="ขาย"?"sell":c==="จำนอง"?"mort":"redeem"; }
+function showToast(m){
+  const t=document.getElementById("toast");
+  t.textContent=m; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3000);
+}
+
+/* ══ Build dynamic filters ══ */
+function buildFilters() {
+  const types  = ["", ...new Set(DATA.map(d=>d.regCode).filter(Boolean))];
+  const condos = ["", ...new Set(DATA.map(d=>d.condo).filter(Boolean))];
+
+  document.getElementById("typeFilters").innerHTML = types.map(t => {
+    const cnt = t ? DATA.filter(d=>d.regCode===t).length : DATA.length;
+    return `<button class="filter-btn${activeType===t?' active':''}" data-type="${t}" onclick="setType('${t}')">${t||'ทั้งหมด'} <span class="filter-count">${cnt}</span></button>`;
+  }).join("");
+
+  document.getElementById("condoFilters").innerHTML = condos.map(c => {
+    const cnt  = c ? DATA.filter(d=>d.condo===c).length : DATA.length;
+    const lbl  = c ? c.replace("บ้านเอื้ออาทร ","") : "ทั้งหมด";
+    const safe = c.replace(/'/g,"\\'");
+    return `<button class="filter-btn${activeCondo===c?' active':''}" data-condo="${c}" onclick="setCondo('${safe}')">${lbl} <span class="filter-count">${cnt}</span></button>`;
+  }).join("");
+
+  document.getElementById("totalCount").textContent = DATA.length;
+}
+
+function setType(t){ activeType=t; document.querySelectorAll('[data-type]').forEach(b=>b.classList.toggle('active',b.dataset.type===t)); openIdx=-1; render(); }
+function setCondo(c){ activeCondo=c; document.querySelectorAll('[data-condo]').forEach(b=>b.classList.toggle('active',b.dataset.condo===c)); openIdx=-1; render(); }
+function toggleCard(i){ openIdx=openIdx===i?-1:i; render(); }
+
+/* ══ Render ══ */
+function render(){
+  const q=document.getElementById("search").value.toLowerCase().trim();
+  const sort=document.getElementById("sortBy").value;
+
+  let filtered=DATA.filter(d=>{
+    const nm=(d.ownTitle+d.ownFname+d.ownLname).toLowerCase();
+    return (!q||nm.includes(q)||String(d.room).includes(q)||String(d.bld).includes(q)||d.regCode.includes(q))
+        && (!activeType||d.regCode===activeType)
+        && (!activeCondo||d.condo===activeCondo);
+  });
+
+  if(sort==="amt-desc") filtered.sort((a,b)=>b.regAmt-a.regAmt);
+  else if(sort==="amt-asc") filtered.sort((a,b)=>a.regAmt-b.regAmt);
+  else if(sort==="name") filtered.sort((a,b)=>(a.ownFname+a.ownLname).localeCompare(b.ownFname+b.ownLname,'th'));
+
+  document.getElementById("showCount").textContent=filtered.length;
+  const total=filtered.reduce((s,d)=>s+Number(d.regAmt),0);
+  document.getElementById("sumAmt").textContent=fmtM(total);
+  document.getElementById("avgAmt").textContent=filtered.length?fmt(Math.round(total/filtered.length)):"—";
+
+  const list=document.getElementById("list");
+  if(!filtered.length){ list.innerHTML='<div class="empty">🔍 ไม่พบข้อมูลที่ตรงกับการค้นหา</div>'; return; }
+
+  list.innerHTML=filtered.map(d=>{
+    const ri=DATA.indexOf(d);
+    const io=openIdx===ri;
+    const cs=d.condo?d.condo.replace("บ้านเอื้ออาทร ",""):d.condo||"—";
+    return `<div class="card${io?" open":""}" onclick="toggleCard(${ri})">
+      <div class="card-head">
+        <div class="room-pill">${d.room||"—"}</div>
+        <div class="card-info">
+          <div class="card-name">${d.ownTitle||""}${d.ownFname||""} ${d.ownLname||""}</div>
+          <div class="card-meta">
+            <span>${cs}</span>
+            ${d.bld?`<span>อาคาร ${d.bld}</span>`:""}
+            ${d.floor?`<span>ชั้น ${d.floor}</span>`:""}
+            ${d.area?`<span>${d.area} ตร.ม.</span>`:""}
+          </div>
+        </div>
+        <div class="card-right">
+          <span class="type-badge ${tcls(d.regCode)}">${d.regCode}</span>
+          <div><div class="card-amt">${fmt(d.regAmt)} ฿</div><div class="card-date">${d.regDate||""}</div></div>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="detail">
+        <div class="detail-col">
+          <div class="detail-title">🏢 ข้อมูลห้องชุด</div>
+          <div class="row"><span class="row-label">โครงการ</span><span class="row-val">${cs}</span></div>
+          ${d.bld?`<div class="row"><span class="row-label">อาคาร</span><span class="row-val">${d.bld}</span></div>`:""}
+          ${d.floor?`<div class="row"><span class="row-label">ชั้น</span><span class="row-val">${d.floor}</span></div>`:""}
+          <div class="row"><span class="row-label">เลขห้อง</span><span class="row-val">${d.room||"—"}</span></div>
+          ${d.area?`<div class="row"><span class="row-label">พื้นที่</span><span class="row-val">${d.area} ตร.ม.</span></div>`:""}
+        </div>
+        <div class="detail-col">
+          <div class="detail-title">👤 ข้อมูลเจ้าของ</div>
+          <div class="row"><span class="row-label">ชื่อ-นามสกุล</span><span class="row-val">${d.ownTitle||""}${d.ownFname||""} ${d.ownLname||""}</span></div>
+          ${d.ownId?`<div class="row"><span class="row-label">เลขบัตร</span><span class="row-val id-text">${d.ownId}</span></div>`:""}
+          ${d.ownTel?`<div class="row"><span class="row-label">โทรศัพท์</span><span class="row-val">${d.ownTel}</span></div>`:""}
+          <div class="row"><span class="row-label">ที่อยู่</span><span class="row-val">${addr(d)}</span></div>
+        </div>
+        <div class="detail-col">
+          <div class="detail-title">📄 ข้อมูลนิติกรรม</div>
+          <div class="row"><span class="row-label">ประเภท</span><span class="row-val"><span class="type-badge ${tcls(d.regCode)}">${d.regCode}</span></span></div>
+          ${d.regDate?`<div class="row"><span class="row-label">วันที่จดทะเบียน</span><span class="row-val">${d.regDate}</span></div>`:""}
+          <div class="row"><span class="row-label">มูลค่า</span><span class="row-val" style="font-weight:700">${fmt(d.regAmt)} บาท</span></div>
+          ${d.ownProv?`<div class="row"><span class="row-label">จังหวัด</span><span class="row-val">${d.ownProv}</span></div>`:""}
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ══ CSV Parser ══ */
+function detectSep(line){ return (line.match(/\|/g)||[]).length >= (line.match(/,/g)||[]).length ? '|' : ','; }
+
+function parseCSV(text){
+  const lines=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim());
+  if(lines.length<2) return {error:"ไฟล์ต้องมีอย่างน้อย 2 บรรทัด"};
+  const sep=detectSep(lines[0]);
+  const cols=lines[0].split(sep).map(c=>c.trim());
+  const missing=REQUIRED.filter(r=>!cols.includes(r));
+  if(missing.length) return {error:`ไม่พบคอลัมน์ที่จำเป็น: ${missing.join(', ')}`};
+
+  const rows=lines.slice(1).map(line=>{
+    const vals=line.split(sep);
+    const raw={}; cols.forEach((c,i)=>{ raw[c]=(vals[i]||"").trim(); });
+    const m={};
+    Object.keys(COL_MAP).forEach(k=>{ m[COL_MAP[k]]=raw[k]||""; });
+    m.regAmt=parseFloat(m.regAmt)||0;
+    return m;
+  }).filter(r=>r.room||r.ownFname);
+
+  return {rows, cols, sep, rawLines:lines};
+}
+
+/* ══ Import Modal ══ */
+function openImport(){ clearFile(); document.getElementById("modalBackdrop").classList.add("show"); document.body.style.overflow="hidden"; }
+function closeImport(){ document.getElementById("modalBackdrop").classList.remove("show"); document.body.style.overflow=""; }
+function backdropClick(e){ if(e.target===document.getElementById("modalBackdrop")) closeImport(); }
+
+function setMsg(type,text){ const e=document.getElementById("impMsg"); e.className="imp-msg "+type; e.textContent=text; }
+
+function clearFile(){
+  pendingData=null;
+  document.getElementById("fileInput").value="";
+  document.getElementById("fileInfo").classList.remove("show");
+  document.getElementById("previewWrap").classList.remove("show");
+  document.getElementById("impMsg").className="imp-msg";
+  document.getElementById("impMsg").textContent="";
+  document.getElementById("btnOk").disabled=true;
+}
+
+function handleFile(file){
+  if(!file) return;
+  if(!file.name.match(/\.(csv|txt)$/i)){ setMsg("err","รองรับเฉพาะไฟล์ .csv หรือ .txt เท่านั้น"); return; }
+  document.getElementById("fileName").textContent=file.name;
+  document.getElementById("fileSize").textContent=(file.size/1024).toFixed(1)+" KB";
+  document.getElementById("fileInfo").classList.add("show");
+
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const result=parseCSV(e.target.result);
+    if(result.error){ setMsg("err","⚠ "+result.error); document.getElementById("btnOk").disabled=true; return; }
+
+    // Preview table (first 5 data rows, first 10 cols)
+    const showCols=result.cols.slice(0,10);
+    const more=result.cols.length>10;
+    const previewRows=result.rawLines.slice(1,6).map(line=>{
+      const vals=line.split(result.sep);
+      const obj={}; result.cols.forEach((c,i)=>{ obj[c]=(vals[i]||"").trim(); });
+      return obj;
+    });
+    document.getElementById("previewTable").innerHTML=
+      `<thead><tr>${showCols.map(c=>`<th>${c}</th>`).join("")}${more?'<th>…</th>':''}</tr></thead>`+
+      `<tbody>${previewRows.map(r=>`<tr>${showCols.map(c=>`<td>${r[c]||""}</td>`).join("")}${more?'<td>…</td>':''}</tr>`).join("")}</tbody>`;
+    document.getElementById("previewCols").textContent=result.cols.length;
+    document.getElementById("previewRows").textContent=result.rows.length;
+    document.getElementById("previewWrap").classList.add("show");
+
+    pendingData=result.rows;
+    const cS=result.rows.filter(r=>r.regCode==="ขาย").length;
+    const cM=result.rows.filter(r=>r.regCode==="จำนอง").length;
+    const cR=result.rows.filter(r=>r.regCode==="ไถ่ถอนจากจำนอง").length;
+    setMsg("ok",`✔ พบข้อมูล ${result.rows.length} รายการ · ขาย ${cS} · จำนอง ${cM} · ไถ่ถอนฯ ${cR}`);
+    document.getElementById("btnOk").disabled=false;
+  };
+  reader.readAsText(file,"UTF-8");
+}
+
+function onFileSelect(e){ handleFile(e.target.files[0]); }
+function onDragOver(e){ e.preventDefault(); document.getElementById("dropZone").classList.add("drag-over"); }
+function onDragLeave(){ document.getElementById("dropZone").classList.remove("drag-over"); }
+function onDrop(e){ e.preventDefault(); document.getElementById("dropZone").classList.remove("drag-over"); handleFile(e.dataTransfer.files[0]); }
+
+function confirmImport(){
+  if(!pendingData||!pendingData.length) return;
+  DATA=pendingData; activeType=""; activeCondo=""; openIdx=-1;
+  const names=[...new Set(DATA.map(d=>d.condo).filter(Boolean))];
+  document.getElementById("headerSub").textContent=names.length<=2?names.join(" · "):names[0]+" และอื่น ๆ";
+  buildFilters(); render(); closeImport();
+  showToast(`✔ นำเข้าสำเร็จ ${DATA.length} รายการ`);
+}
+
+/* ══ Init ══ */
+buildFilters();
+render();
+</script>
+</body>
+</html>
