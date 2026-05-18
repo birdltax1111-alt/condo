@@ -6,32 +6,38 @@
 <title>ระบบดูข้อมูลนิติกรรมห้องชุด</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
-  :root {
-    --bg:#f4f2ee; --surface:#fff; --surface2:#f9f8f5;
-    --border:#e2ddd6; --border2:#ccc8bf;
-    --text1:#1a1816; --text2:#5c5750; --text3:#9e9890;
-    --accent:#2a5f8f; --accent-light:#ddeaf6;
-    --sell:#2d6a2d; --sell-bg:#e6f3e6;
-    --mort:#7a4a00; --mort-bg:#fef3e0;
-    --redb:#1a4e7a; --redb-bg:#ddeaf6;
-    --radius:10px; --radius-sm:6px;
+  :root{
+    --bg:#f4f2ee;--surface:#fff;--surface2:#f9f8f5;
+    --border:#e2ddd6;--border2:#ccc8bf;
+    --text1:#1a1816;--text2:#5c5750;--text3:#9e9890;
+    --accent:#2a5f8f;--accent-light:#ddeaf6;
+    --sell:#2d6a2d;--sell-bg:#e6f3e6;
+    --mort:#7a4a00;--mort-bg:#fef3e0;
+    --redb:#1a4e7a;--redb-bg:#ddeaf6;
+    --danger:#a02020;--danger-bg:#fde8e8;--danger-border:#f5c0c0;
+    --radius:10px;--radius-sm:6px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text1);min-height:100vh}
 
-  /* Header */
+  /* ── Header ── */
   header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
-  .logo{display:flex;align-items:center;gap:10px}
-  .logo-icon{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px}
-  .logo-text{font-size:15px;font-weight:600}
-  .logo-sub{font-size:12px;color:var(--text2);font-weight:400}
-  .btn-import{display:flex;align-items:center;gap:6px;padding:7px 16px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+  .logo{display:flex;align-items:center;gap:10px;min-width:0}
+  .logo-icon{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;flex-shrink:0}
+  .logo-text{font-size:15px;font-weight:600;white-space:nowrap}
+  .logo-sub{font-size:12px;color:var(--text2);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+  .hdr-btns{display:flex;gap:8px;flex-shrink:0}
+  .btn-import{display:flex;align-items:center;gap:5px;padding:7px 14px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
   .btn-import:hover{background:#1e4e78}
+  .btn-danger{display:flex;align-items:center;gap:5px;padding:7px 14px;background:white;color:var(--danger);border:1px solid var(--danger-border);border-radius:var(--radius-sm);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+  .btn-danger:hover{background:var(--danger-bg)}
+  .btn-danger{display:none}
+  .btn-danger.show{display:flex}
 
-  /* Layout */
-  .layout{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 60px)}
+  /* ── Layout ── */
+  .layout{display:grid;grid-template-columns:285px 1fr;min-height:calc(100vh - 60px)}
 
-  /* Sidebar */
+  /* ── Sidebar ── */
   aside{background:var(--surface);border-right:1px solid var(--border);padding:1.25rem;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
   .sidebar-section{margin-bottom:1.5rem}
   .sidebar-label{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
@@ -39,27 +45,44 @@
   .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:15px;pointer-events:none}
   input[type="text"]{width:100%;height:36px;padding:0 10px 0 32px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:'Sarabun',sans-serif;font-size:14px;background:var(--surface2);color:var(--text1);outline:none;transition:border-color .15s}
   input[type="text"]:focus{border-color:var(--accent);background:white}
-  .filter-group{display:flex;flex-direction:column;gap:6px}
+  .filter-group{display:flex;flex-direction:column;gap:5px}
   .filter-btn{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid transparent;background:transparent;font-family:'Sarabun',sans-serif;font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s;text-align:left;width:100%}
   .filter-btn:hover{background:var(--surface2);color:var(--text1)}
   .filter-btn.active{background:var(--accent-light);border-color:#b5ceea;color:var(--accent);font-weight:600}
   .filter-count{background:var(--bg);border-radius:20px;padding:1px 8px;font-size:11px;color:var(--text3);flex-shrink:0}
   .filter-btn.active .filter-count{background:#c8dff0;color:var(--accent)}
+
+  /* Month chip grid */
+  .month-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .month-chip{padding:6px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);font-family:'Sarabun',sans-serif;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;text-align:center;line-height:1.3}
+  .month-chip:hover{border-color:var(--border2);color:var(--text1);background:white}
+  .month-chip.active{background:var(--accent-light);border-color:#b5ceea;color:var(--accent);font-weight:600}
+  .month-chip .mc-mon{font-weight:600;font-size:13px}
+  .month-chip .mc-cnt{font-size:10px;color:var(--text3);margin-top:1px}
+  .month-chip.active .mc-cnt{color:var(--accent)}
+
   .stat-mini{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;text-align:center}
   .stat-num{font-size:22px;font-weight:700;line-height:1;margin-bottom:3px}
   .stat-lbl{font-size:11px;color:var(--text2)}
 
-  /* Main */
+  /* ── Main ── */
   main{padding:1.25rem 1.5rem;overflow-y:auto}
-  .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+  .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
   .toolbar-left{font-size:13px;color:var(--text2)}
   .toolbar-left strong{color:var(--text1);font-weight:600}
+
+  /* Active filter chips strip */
+  .active-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:var(--accent-light);border:1px solid #b5ceea;border-radius:20px;font-size:12px;color:var(--accent);font-weight:500}
+  .chip-x{background:none;border:none;cursor:pointer;color:var(--accent);font-size:14px;padding:0;line-height:1;opacity:.7}
+  .chip-x:hover{opacity:1}
+
   .sort-wrap{display:flex;align-items:center;gap:6px}
   .sort-wrap label{font-size:12px;color:var(--text2)}
   select{height:30px;padding:0 8px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:'Sarabun',sans-serif;font-size:12px;background:white;color:var(--text1);outline:none;cursor:pointer}
 
-  /* Cards */
+  /* ── Cards ── */
   #list{display:flex;flex-direction:column;gap:8px}
   .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:box-shadow .2s,border-color .2s;cursor:pointer}
   .card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);border-color:var(--border2)}
@@ -85,10 +108,10 @@
   .detail-col{padding:14px 16px;border-right:1px solid var(--border)}
   .detail-col:last-child{border-right:none}
   .detail-title{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px}
-  .row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:13px;border-bottom:1px solid var(--border)}
-  .row:last-child{border-bottom:none}
-  .row-label{color:var(--text2);flex-shrink:0;margin-right:8px}
-  .row-val{color:var(--text1);font-weight:500;text-align:right;word-break:break-word}
+  .drow{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:13px;border-bottom:1px solid var(--border)}
+  .drow:last-child{border-bottom:none}
+  .drow-label{color:var(--text2);flex-shrink:0;margin-right:8px}
+  .drow-val{color:var(--text1);font-weight:500;text-align:right;word-break:break-word}
   .id-text{font-family:monospace;font-size:12px;letter-spacing:.03em}
   .empty{text-align:center;padding:3rem;color:var(--text3);font-size:14px}
 
@@ -102,16 +125,12 @@
   .btn-close{width:28px;height:28px;border:none;background:var(--surface2);border-radius:50%;font-size:16px;cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:background .15s;line-height:1}
   .btn-close:hover{background:var(--border)}
   .modal-body{padding:20px}
-
-  /* Drop zone */
   .drop-zone{border:2px dashed var(--border2);border-radius:10px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2)}
   .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:var(--accent-light)}
-  .drop-zone .dz-icon{font-size:42px;margin-bottom:10px}
-  .drop-zone .dz-title{font-size:15px;font-weight:600;margin-bottom:4px}
-  .drop-zone .dz-sub{font-size:12px;color:var(--text2)}
+  .dz-icon{font-size:42px;margin-bottom:10px}
+  .dz-title{font-size:15px;font-weight:600;margin-bottom:4px}
+  .dz-sub{font-size:12px;color:var(--text2)}
   .drop-zone input[type="file"]{display:none}
-
-  /* File info */
   .file-info{display:none;margin-top:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;align-items:center;gap:10px}
   .file-info.show{display:flex}
   .file-icon{font-size:22px}
@@ -119,8 +138,6 @@
   .file-size{font-size:12px;color:var(--text2);flex-shrink:0}
   .btn-clr{background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;padding:0 2px;line-height:1;transition:color .15s}
   .btn-clr:hover{color:#c0392b}
-
-  /* Preview */
   .preview-wrap{display:none;margin-top:12px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden}
   .preview-wrap.show{display:block}
   .preview-hdr{background:var(--surface2);padding:8px 12px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
@@ -130,14 +147,11 @@
   .ptable th{background:#f0ede8;padding:6px 10px;text-align:left;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);position:sticky;top:0}
   .ptable td{padding:5px 10px;border-bottom:1px solid var(--border);max-width:160px;overflow:hidden;text-overflow:ellipsis}
   .ptable tr:last-child td{border-bottom:none}
-
-  /* Msg */
   .imp-msg{display:none;margin-top:10px;padding:9px 13px;border-radius:var(--radius-sm);font-size:13px}
   .imp-msg.err{display:block;background:#fde8e8;color:#a02020;border:1px solid #f5c0c0}
-  .imp-msg.warn{display:block;background:#fff8e1;color:#7a5a00;border:1px solid #f5dfa0}
   .imp-msg.ok{display:block;background:#e8f5e9;color:#2a6a2a;border:1px solid #b5d9b5}
-
-  /* Footer */
+  .hint-box{margin-top:12px;padding:10px 13px;background:#f8f6f0;border-radius:var(--radius-sm);font-size:12px;color:var(--text2);line-height:1.6}
+  .hint-box strong{color:var(--text1)}
   .modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--border);background:var(--surface2)}
   .btn-cancel{padding:8px 18px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:white;font-family:'Sarabun',sans-serif;font-size:13px;cursor:pointer;color:var(--text2);transition:background .15s}
   .btn-cancel:hover{background:var(--surface2)}
@@ -145,7 +159,19 @@
   .btn-ok:hover{background:#1e4e78}
   .btn-ok:disabled{background:var(--border2);cursor:not-allowed}
 
-  /* Toast */
+  /* ── Confirm Modal ── */
+  .confirm-modal{background:white;border-radius:14px;width:360px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.25);transform:translateY(12px);transition:transform .2s;overflow:hidden}
+  .modal-backdrop.show .confirm-modal{transform:translateY(0)}
+  .confirm-icon{font-size:44px;text-align:center;padding:24px 0 8px}
+  .confirm-body{padding:0 24px 20px;text-align:center}
+  .confirm-title{font-size:17px;font-weight:700;margin-bottom:8px}
+  .confirm-desc{font-size:13px;color:var(--text2);line-height:1.6}
+  .confirm-footer{display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--border);background:var(--surface2)}
+  .confirm-footer .btn-cancel{flex:1}
+  .btn-danger-solid{flex:1;padding:8px 16px;border-radius:var(--radius-sm);border:none;background:#c0392b;color:white;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+  .btn-danger-solid:hover{background:#a02020}
+
+  /* ── Toast ── */
   .toast{position:fixed;bottom:24px;right:24px;background:#1a1816;color:white;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999}
   .toast.show{opacity:1;transform:translateY(0)}
 
@@ -159,6 +185,7 @@
     .card.open .detail{grid-template-columns:1fr}
     .detail-col{border-right:none;border-bottom:1px solid var(--border)}
     .logo-sub{display:none}
+    .month-grid{grid-template-columns:repeat(3,1fr)}
   }
 </style>
 </head>
@@ -172,10 +199,14 @@
       <div class="logo-sub" id="headerSub">บ้านเอื้ออาทร กระทุ่มแบน · สมุทรสาคร</div>
     </div>
   </div>
-  <button class="btn-import" onclick="openImport()">📂 นำเข้าข้อมูล CSV</button>
+  <div class="hdr-btns">
+    <button class="btn-danger" id="btnClearData" onclick="openConfirmClear()">🗑 ล้างข้อมูล</button>
+    <button class="btn-import" onclick="openImport()">📂 นำเข้าข้อมูล CSV</button>
+  </div>
 </header>
 
 <div class="layout">
+  <!-- Sidebar -->
   <aside>
     <div class="sidebar-section">
       <div class="sidebar-label">ค้นหา</div>
@@ -184,14 +215,22 @@
         <input type="text" id="search" placeholder="ชื่อ, เลขห้อง, อาคาร..." oninput="render()">
       </div>
     </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">เดือนที่จดทะเบียน</div>
+      <div class="month-grid" id="monthFilters"></div>
+    </div>
+
     <div class="sidebar-section">
       <div class="sidebar-label">ประเภทนิติกรรม</div>
       <div class="filter-group" id="typeFilters"></div>
     </div>
+
     <div class="sidebar-section">
       <div class="sidebar-label">โครงการ</div>
       <div class="filter-group" id="condoFilters"></div>
     </div>
+
     <div class="sidebar-section">
       <div class="sidebar-label">สรุปมูลค่า</div>
       <div class="stat-mini">
@@ -201,6 +240,7 @@
     </div>
   </aside>
 
+  <!-- Main -->
   <main>
     <div class="toolbar">
       <div class="toolbar-left">แสดง <strong id="showCount">0</strong> จาก <strong id="totalCount">0</strong> รายการ</div>
@@ -214,55 +254,42 @@
         </select>
       </div>
     </div>
+    <!-- Active filter chips -->
+    <div class="active-chips" id="activeChips"></div>
     <div id="list"></div>
   </main>
 </div>
 
 <!-- ── Import Modal ── -->
-<div class="modal-backdrop" id="modalBackdrop" onclick="backdropClick(event)">
+<div class="modal-backdrop" id="modalImport" onclick="backdropClick(event,'modalImport')">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">📂 นำเข้าข้อมูล CSV</div>
       <button class="btn-close" onclick="closeImport()">✕</button>
     </div>
     <div class="modal-body">
-
-      <!-- Drop zone -->
       <div class="drop-zone" id="dropZone"
            onclick="document.getElementById('fileInput').click()"
-           ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+           ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
         <div class="dz-icon">📄</div>
         <div class="dz-title">คลิกเพื่อเลือกไฟล์ หรือลากมาวางที่นี่</div>
         <div class="dz-sub">รองรับไฟล์ .csv (คั่นด้วย | หรือ ,)</div>
         <input type="file" id="fileInput" accept=".csv,.txt" onchange="onFileSelect(event)">
       </div>
-
-      <!-- File info bar -->
       <div class="file-info" id="fileInfo">
         <span class="file-icon">📄</span>
         <span class="file-name" id="fileName">—</span>
         <span class="file-size" id="fileSize"></span>
-        <button class="btn-clr" onclick="clearFile()" title="ลบ">✕</button>
+        <button class="btn-clr" onclick="clearFile()">✕</button>
       </div>
-
-      <!-- Preview table -->
       <div class="preview-wrap" id="previewWrap">
-        <div class="preview-hdr">
-          ตัวอย่างข้อมูล (5 แถวแรก) · <strong id="previewCols">0</strong> คอลัมน์ · <strong id="previewRows">0</strong> แถว
-        </div>
-        <div class="preview-scroll">
-          <table class="ptable" id="previewTable"></table>
-        </div>
+        <div class="preview-hdr">ตัวอย่างข้อมูล (5 แถวแรก) · <strong id="prevCols">0</strong> คอลัมน์ · <strong id="prevRows">0</strong> แถว</div>
+        <div class="preview-scroll"><table class="ptable" id="previewTable"></table></div>
       </div>
-
-      <!-- Status message -->
       <div class="imp-msg" id="impMsg"></div>
-
-      <!-- Format hint -->
-      <div style="margin-top:12px;padding:10px 13px;background:#f8f6f0;border-radius:var(--radius-sm);font-size:12px;color:var(--text2);line-height:1.6">
-        <strong style="color:var(--text1)">คอลัมน์ที่ต้องการ:</strong>
-        CONDO_NAME, ROOM_NO, OWN_FNAME, OWN_LNAME, REG_CODE, REG_AMT<br>
-        <strong style="color:var(--text1)">ตัวคั่น:</strong> | (pipe) หรือ , (comma) — ตรวจจับอัตโนมัติ
+      <div class="hint-box">
+        <strong>คอลัมน์ที่ต้องการ:</strong> CONDO_NAME, ROOM_NO, OWN_FNAME, OWN_LNAME, REG_CODE, REG_AMT<br>
+        <strong>ตัวคั่น:</strong> | (pipe) หรือ , (comma) — ตรวจจับอัตโนมัติ
       </div>
     </div>
     <div class="modal-footer">
@@ -272,12 +299,41 @@
   </div>
 </div>
 
+<!-- ── Confirm Clear Modal ── -->
+<div class="modal-backdrop" id="modalConfirm" onclick="backdropClick(event,'modalConfirm')">
+  <div class="confirm-modal">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-body">
+      <div class="confirm-title">ล้างข้อมูลทั้งหมด?</div>
+      <div class="confirm-desc">ข้อมูลที่นำเข้าจะถูกลบออกทั้งหมด<br>และจะโหลดข้อมูลตัวอย่างกลับมาแทน<br>การกระทำนี้ไม่สามารถย้อนกลับได้</div>
+    </div>
+    <div class="confirm-footer">
+      <button class="btn-cancel" onclick="closeConfirm()">ยกเลิก</button>
+      <button class="btn-danger-solid" onclick="executeClear()">🗑 ล้างข้อมูล</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══ DATA ══ */
-let DATA = [
+/* ══════════════════ CONSTANTS ══════════════════ */
+const MONTH_TH = ["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+const MONTH_FULL = ["","มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+
+const COL_MAP = {
+  CONDO_NAME:'condo',BLD_NAME:'bld',FLOOR_NO:'floor',ROOM_NO:'room',
+  AREA:'area',OWN_TITLE:'ownTitle',OWN_FNAME:'ownFname',OWN_LNAME:'ownLname',
+  OWN_PERS_ID:'ownId',OWN_HSE_NO:'ownHse',OWN_MOO:'ownMoo',OWN_SOI:'ownSoi',
+  OWN_ROAD:'ownRoad',OWN_TAMBOL:'ownTambol',OWN_AMPHUR:'ownAmphur',
+  OWN_PROVINCE:'ownProv',OWN_TEL:'ownTel',
+  REG_CODE:'regCode',REG_DATE:'regDate',REG_AMT:'regAmt'
+};
+const REQUIRED = ['CONDO_NAME','ROOM_NO','OWN_FNAME','OWN_LNAME','REG_CODE','REG_AMT'];
+
+/* ══════════════════ DEFAULT DATA ══════════════════ */
+const DEFAULT_DATA = [
   {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"38",floor:"3",room:"128/20",area:"32.42",ownTitle:"นางสาว",ownFname:"ลุน",ownLname:"กิ่งป้อง",ownId:"2331000003900",ownHse:"61",ownMoo:"14",ownSoi:"",ownRoad:"",ownTambol:"ก้านเหลือง",ownAmphur:"อุทุมพรพิสัย",ownProv:"ศรีสะเกษ",ownTel:"",regCode:"ไถ่ถอนจากจำนอง",regDate:"02/03/2569",regAmt:387000},
   {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"41",floor:"4",room:"131/32",area:"32.42",ownTitle:"นาย",ownFname:"สายัณห์",ownLname:"บัณฑิตานุกูล",ownId:"1101800504001",ownHse:"59/41",ownMoo:"",ownSoi:"ราชพฤกษ์ 9",ownRoad:"",ownTambol:"บางเชือกหนัง",ownAmphur:"ตลิ่งชัน",ownProv:"กรุงเทพมหานคร",ownTel:"",regCode:"ขาย",regDate:"06/03/2569",regAmt:300000},
   {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"35",floor:"2",room:"125/12",area:"32.42",ownTitle:"นางสาว",ownFname:"วราภรณ์",ownLname:"แย้มผกา",ownId:"3102100513170",ownHse:"85",ownMoo:"",ownSoi:"พระรามที่ 2 ซอย 44 แยก 3",ownRoad:"",ownTambol:"ท่าข้าม",ownAmphur:"บางขุนเทียน",ownProv:"กรุงเทพมหานคร",ownTel:"",regCode:"ไถ่ถอนจากจำนอง",regDate:"10/03/2569",regAmt:387000},
@@ -299,83 +355,143 @@ let DATA = [
   {condo:"บ้านเอื้ออาทร กระทุ่มแบน 2",bld:"47",floor:"5",room:"137/42",area:"32.42",ownTitle:"นางสาว",ownFname:"นิภาวัลย์",ownLname:"จำชาติ",ownId:"",ownHse:"",ownMoo:"",ownSoi:"",ownRoad:"",ownTambol:"",ownAmphur:"",ownProv:"",ownTel:"",regCode:"จำนอง",regDate:"31/03/2569",regAmt:618337},
 ];
 
-let activeType="", activeCondo="", openIdx=-1, pendingData=null;
+/* ══════════════════ STATE ══════════════════ */
+let DATA        = DEFAULT_DATA.map(d=>({...d}));
+let activeType  = "";
+let activeCondo = "";
+let activeMonth = "";   // "MM/YYYY" e.g. "03/2569"
+let openIdx     = -1;
+let pendingData = null;
+let isImported  = false;
 
-/* ══ Column mapping ══ */
-const COL_MAP = {
-  CONDO_NAME:'condo', BLD_NAME:'bld', FLOOR_NO:'floor', ROOM_NO:'room',
-  AREA:'area', OWN_TITLE:'ownTitle', OWN_FNAME:'ownFname', OWN_LNAME:'ownLname',
-  OWN_PERS_ID:'ownId', OWN_HSE_NO:'ownHse', OWN_MOO:'ownMoo', OWN_SOI:'ownSoi',
-  OWN_ROAD:'ownRoad', OWN_TAMBOL:'ownTambol', OWN_AMPHUR:'ownAmphur',
-  OWN_PROVINCE:'ownProv', OWN_TEL:'ownTel',
-  REG_CODE:'regCode', REG_DATE:'regDate', REG_AMT:'regAmt'
-};
-const REQUIRED = ['CONDO_NAME','ROOM_NO','OWN_FNAME','OWN_LNAME','REG_CODE','REG_AMT'];
-
-/* ══ Helpers ══ */
+/* ══════════════════ HELPERS ══════════════════ */
 function fmt(n)  { return Number(n).toLocaleString('th-TH',{maximumFractionDigits:0}); }
 function fmtM(n) { return (n/1000000).toFixed(2); }
+function tcls(c) { return c==="ขาย"?"sell":c==="จำนอง"?"mort":"redeem"; }
+
+function getMonthKey(dateStr) {
+  if(!dateStr) return "";
+  const p = String(dateStr).split("/");
+  if(p.length<3) return "";
+  return p[1].padStart(2,"0") + "/" + p[2];   // MM/YYYY
+}
+function monthKeyLabel(key) {
+  if(!key) return "";
+  const [mm,yy] = key.split("/");
+  return MONTH_TH[parseInt(mm,10)] + " " + yy;
+}
+function monthKeyFull(key) {
+  if(!key) return "";
+  const [mm,yy] = key.split("/");
+  return MONTH_FULL[parseInt(mm,10)] + " " + yy;
+}
+
 function addr(d) {
   return [d.ownHse, d.ownMoo?"หมู่ "+d.ownMoo:"", d.ownSoi?"ซอย "+d.ownSoi:"",
           d.ownRoad, d.ownTambol, d.ownAmphur, d.ownProv]
     .filter(x=>x&&String(x).trim()).join(" ") || "—";
 }
-function tcls(c){ return c==="ขาย"?"sell":c==="จำนอง"?"mort":"redeem"; }
-function showToast(m){
+
+function showToast(m,ms=3000) {
   const t=document.getElementById("toast");
   t.textContent=m; t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),3000);
+  setTimeout(()=>t.classList.remove("show"),ms);
 }
 
-/* ══ Build dynamic filters ══ */
+/* ══════════════════ BUILD FILTERS ══════════════════ */
 function buildFilters() {
-  const types  = ["", ...new Set(DATA.map(d=>d.regCode).filter(Boolean))];
-  const condos = ["", ...new Set(DATA.map(d=>d.condo).filter(Boolean))];
+  /* Month chips */
+  const monthMap = {};
+  DATA.forEach(d=>{
+    const k = getMonthKey(d.regDate);
+    if(k) monthMap[k] = (monthMap[k]||0)+1;
+  });
+  const monthKeys = Object.keys(monthMap).sort((a,b)=>{
+    const [ma,ya]=a.split("/"); const [mb,yb]=b.split("/");
+    return ya!==yb ? ya.localeCompare(yb) : parseInt(ma)-parseInt(mb);
+  });
 
-  document.getElementById("typeFilters").innerHTML = types.map(t => {
+  document.getElementById("monthFilters").innerHTML =
+    (monthKeys.length===0
+      ? '<div style="font-size:12px;color:var(--text3);grid-column:1/-1">ไม่พบข้อมูลวันที่</div>'
+      : monthKeys.map(k=>`
+      <div class="month-chip${activeMonth===k?' active':''}" onclick="setMonth('${k}')">
+        <div class="mc-mon">${monthKeyLabel(k)}</div>
+        <div class="mc-cnt">${monthMap[k]} รายการ</div>
+      </div>`).join(""));
+
+  /* Type */
+  const types = ["", ...new Set(DATA.map(d=>d.regCode).filter(Boolean))];
+  document.getElementById("typeFilters").innerHTML = types.map(t=>{
     const cnt = t ? DATA.filter(d=>d.regCode===t).length : DATA.length;
     return `<button class="filter-btn${activeType===t?' active':''}" data-type="${t}" onclick="setType('${t}')">${t||'ทั้งหมด'} <span class="filter-count">${cnt}</span></button>`;
   }).join("");
 
-  document.getElementById("condoFilters").innerHTML = condos.map(c => {
-    const cnt  = c ? DATA.filter(d=>d.condo===c).length : DATA.length;
-    const lbl  = c ? c.replace("บ้านเอื้ออาทร ","") : "ทั้งหมด";
-    const safe = c.replace(/'/g,"\\'");
-    return `<button class="filter-btn${activeCondo===c?' active':''}" data-condo="${c}" onclick="setCondo('${safe}')">${lbl} <span class="filter-count">${cnt}</span></button>`;
+  /* Condo */
+  const condos = ["", ...new Set(DATA.map(d=>d.condo).filter(Boolean))];
+  document.getElementById("condoFilters").innerHTML = condos.map(c=>{
+    const cnt = c ? DATA.filter(d=>d.condo===c).length : DATA.length;
+    const lbl = c ? c.replace("บ้านเอื้ออาทร ","") : "ทั้งหมด";
+    return `<button class="filter-btn${activeCondo===c?' active':''}" data-condo="${c}" onclick="setCondo('${c.replace(/'/g,"\\'")}')">${lbl} <span class="filter-count">${cnt}</span></button>`;
   }).join("");
 
   document.getElementById("totalCount").textContent = DATA.length;
 }
 
-function setType(t){ activeType=t; document.querySelectorAll('[data-type]').forEach(b=>b.classList.toggle('active',b.dataset.type===t)); openIdx=-1; render(); }
-function setCondo(c){ activeCondo=c; document.querySelectorAll('[data-condo]').forEach(b=>b.classList.toggle('active',b.dataset.condo===c)); openIdx=-1; render(); }
+/* ══════════════════ FILTER SETTERS ══════════════════ */
+function setMonth(k){
+  activeMonth = activeMonth===k ? "" : k;
+  openIdx=-1; buildFilters(); render();
+}
+function setType(t){
+  activeType=t;
+  document.querySelectorAll('[data-type]').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
+  openIdx=-1; render();
+}
+function setCondo(c){
+  activeCondo=c;
+  document.querySelectorAll('[data-condo]').forEach(b=>b.classList.toggle('active',b.dataset.condo===c));
+  openIdx=-1; render();
+}
 function toggleCard(i){ openIdx=openIdx===i?-1:i; render(); }
 
-/* ══ Render ══ */
-function render(){
-  const q=document.getElementById("search").value.toLowerCase().trim();
-  const sort=document.getElementById("sortBy").value;
+/* ══════════════════ ACTIVE CHIPS STRIP ══════════════════ */
+function renderChips() {
+  const chips=[];
+  if(activeMonth) chips.push(`<span class="chip">📅 ${monthKeyFull(activeMonth)}<button class="chip-x" onclick="setMonth('${activeMonth}')">✕</button></span>`);
+  if(activeType)  chips.push(`<span class="chip">📋 ${activeType}<button class="chip-x" onclick="setType('')">✕</button></span>`);
+  if(activeCondo) chips.push(`<span class="chip">🏢 ${activeCondo.replace("บ้านเอื้ออาทร ","")}<button class="chip-x" onclick="setCondo('')">✕</button></span>`);
+  document.getElementById("activeChips").innerHTML = chips.join("");
+}
 
-  let filtered=DATA.filter(d=>{
+/* ══════════════════ RENDER ══════════════════ */
+function render() {
+  renderChips();
+  const q    = document.getElementById("search").value.toLowerCase().trim();
+  const sort = document.getElementById("sortBy").value;
+
+  let filtered = DATA.filter(d=>{
     const nm=(d.ownTitle+d.ownFname+d.ownLname).toLowerCase();
+    const monthMatch = !activeMonth || getMonthKey(d.regDate)===activeMonth;
     return (!q||nm.includes(q)||String(d.room).includes(q)||String(d.bld).includes(q)||d.regCode.includes(q))
         && (!activeType||d.regCode===activeType)
-        && (!activeCondo||d.condo===activeCondo);
+        && (!activeCondo||d.condo===activeCondo)
+        && monthMatch;
   });
 
   if(sort==="amt-desc") filtered.sort((a,b)=>b.regAmt-a.regAmt);
   else if(sort==="amt-asc") filtered.sort((a,b)=>a.regAmt-b.regAmt);
   else if(sort==="name") filtered.sort((a,b)=>(a.ownFname+a.ownLname).localeCompare(b.ownFname+b.ownLname,'th'));
 
-  document.getElementById("showCount").textContent=filtered.length;
-  const total=filtered.reduce((s,d)=>s+Number(d.regAmt),0);
-  document.getElementById("sumAmt").textContent=fmtM(total);
-  document.getElementById("avgAmt").textContent=filtered.length?fmt(Math.round(total/filtered.length)):"—";
+  document.getElementById("showCount").textContent = filtered.length;
+  const total = filtered.reduce((s,d)=>s+Number(d.regAmt),0);
+  document.getElementById("sumAmt").textContent = fmtM(total);
+  document.getElementById("avgAmt").textContent = filtered.length?fmt(Math.round(total/filtered.length)):"—";
 
-  const list=document.getElementById("list");
+  const list = document.getElementById("list");
   if(!filtered.length){ list.innerHTML='<div class="empty">🔍 ไม่พบข้อมูลที่ตรงกับการค้นหา</div>'; return; }
 
-  list.innerHTML=filtered.map(d=>{
+  list.innerHTML = filtered.map(d=>{
     const ri=DATA.indexOf(d);
     const io=openIdx===ri;
     const cs=d.condo?d.condo.replace("บ้านเอื้ออาทร ",""):d.condo||"—";
@@ -400,33 +516,33 @@ function render(){
       <div class="detail">
         <div class="detail-col">
           <div class="detail-title">🏢 ข้อมูลห้องชุด</div>
-          <div class="row"><span class="row-label">โครงการ</span><span class="row-val">${cs}</span></div>
-          ${d.bld?`<div class="row"><span class="row-label">อาคาร</span><span class="row-val">${d.bld}</span></div>`:""}
-          ${d.floor?`<div class="row"><span class="row-label">ชั้น</span><span class="row-val">${d.floor}</span></div>`:""}
-          <div class="row"><span class="row-label">เลขห้อง</span><span class="row-val">${d.room||"—"}</span></div>
-          ${d.area?`<div class="row"><span class="row-label">พื้นที่</span><span class="row-val">${d.area} ตร.ม.</span></div>`:""}
+          <div class="drow"><span class="drow-label">โครงการ</span><span class="drow-val">${cs}</span></div>
+          ${d.bld?`<div class="drow"><span class="drow-label">อาคาร</span><span class="drow-val">${d.bld}</span></div>`:""}
+          ${d.floor?`<div class="drow"><span class="drow-label">ชั้น</span><span class="drow-val">${d.floor}</span></div>`:""}
+          <div class="drow"><span class="drow-label">เลขห้อง</span><span class="drow-val">${d.room||"—"}</span></div>
+          ${d.area?`<div class="drow"><span class="drow-label">พื้นที่</span><span class="drow-val">${d.area} ตร.ม.</span></div>`:""}
         </div>
         <div class="detail-col">
           <div class="detail-title">👤 ข้อมูลเจ้าของ</div>
-          <div class="row"><span class="row-label">ชื่อ-นามสกุล</span><span class="row-val">${d.ownTitle||""}${d.ownFname||""} ${d.ownLname||""}</span></div>
-          ${d.ownId?`<div class="row"><span class="row-label">เลขบัตร</span><span class="row-val id-text">${d.ownId}</span></div>`:""}
-          ${d.ownTel?`<div class="row"><span class="row-label">โทรศัพท์</span><span class="row-val">${d.ownTel}</span></div>`:""}
-          <div class="row"><span class="row-label">ที่อยู่</span><span class="row-val">${addr(d)}</span></div>
+          <div class="drow"><span class="drow-label">ชื่อ-นามสกุล</span><span class="drow-val">${d.ownTitle||""}${d.ownFname||""} ${d.ownLname||""}</span></div>
+          ${d.ownId?`<div class="drow"><span class="drow-label">เลขบัตร</span><span class="drow-val id-text">${d.ownId}</span></div>`:""}
+          ${d.ownTel?`<div class="drow"><span class="drow-label">โทรศัพท์</span><span class="drow-val">${d.ownTel}</span></div>`:""}
+          <div class="drow"><span class="drow-label">ที่อยู่</span><span class="drow-val">${addr(d)}</span></div>
         </div>
         <div class="detail-col">
           <div class="detail-title">📄 ข้อมูลนิติกรรม</div>
-          <div class="row"><span class="row-label">ประเภท</span><span class="row-val"><span class="type-badge ${tcls(d.regCode)}">${d.regCode}</span></span></div>
-          ${d.regDate?`<div class="row"><span class="row-label">วันที่จดทะเบียน</span><span class="row-val">${d.regDate}</span></div>`:""}
-          <div class="row"><span class="row-label">มูลค่า</span><span class="row-val" style="font-weight:700">${fmt(d.regAmt)} บาท</span></div>
-          ${d.ownProv?`<div class="row"><span class="row-label">จังหวัด</span><span class="row-val">${d.ownProv}</span></div>`:""}
+          <div class="drow"><span class="drow-label">ประเภท</span><span class="drow-val"><span class="type-badge ${tcls(d.regCode)}">${d.regCode}</span></span></div>
+          ${d.regDate?`<div class="drow"><span class="drow-label">วันที่จดทะเบียน</span><span class="drow-val">${d.regDate}</span></div>`:""}
+          <div class="drow"><span class="drow-label">มูลค่า</span><span class="drow-val" style="font-weight:700">${fmt(d.regAmt)} บาท</span></div>
+          ${d.ownProv?`<div class="drow"><span class="drow-label">จังหวัด</span><span class="drow-val">${d.ownProv}</span></div>`:""}
         </div>
       </div>
     </div>`;
   }).join("");
 }
 
-/* ══ CSV Parser ══ */
-function detectSep(line){ return (line.match(/\|/g)||[]).length >= (line.match(/,/g)||[]).length ? '|' : ','; }
+/* ══════════════════ CSV PARSER ══════════════════ */
+function detectSep(line){ return (line.match(/\|/g)||[]).length>=(line.match(/,/g)||[]).length?'|':','; }
 
 function parseCSV(text){
   const lines=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim());
@@ -435,7 +551,6 @@ function parseCSV(text){
   const cols=lines[0].split(sep).map(c=>c.trim());
   const missing=REQUIRED.filter(r=>!cols.includes(r));
   if(missing.length) return {error:`ไม่พบคอลัมน์ที่จำเป็น: ${missing.join(', ')}`};
-
   const rows=lines.slice(1).map(line=>{
     const vals=line.split(sep);
     const raw={}; cols.forEach((c,i)=>{ raw[c]=(vals[i]||"").trim(); });
@@ -444,14 +559,12 @@ function parseCSV(text){
     m.regAmt=parseFloat(m.regAmt)||0;
     return m;
   }).filter(r=>r.room||r.ownFname);
-
-  return {rows, cols, sep, rawLines:lines};
+  return {rows,cols,sep,rawLines:lines};
 }
 
-/* ══ Import Modal ══ */
-function openImport(){ clearFile(); document.getElementById("modalBackdrop").classList.add("show"); document.body.style.overflow="hidden"; }
-function closeImport(){ document.getElementById("modalBackdrop").classList.remove("show"); document.body.style.overflow=""; }
-function backdropClick(e){ if(e.target===document.getElementById("modalBackdrop")) closeImport(); }
+/* ══════════════════ IMPORT MODAL ══════════════════ */
+function openImport(){ clearFile(); document.getElementById("modalImport").classList.add("show"); document.body.style.overflow="hidden"; }
+function closeImport(){ document.getElementById("modalImport").classList.remove("show"); document.body.style.overflow=""; }
 
 function setMsg(type,text){ const e=document.getElementById("impMsg"); e.className="imp-msg "+type; e.textContent=text; }
 
@@ -471,27 +584,23 @@ function handleFile(file){
   document.getElementById("fileName").textContent=file.name;
   document.getElementById("fileSize").textContent=(file.size/1024).toFixed(1)+" KB";
   document.getElementById("fileInfo").classList.add("show");
-
   const reader=new FileReader();
   reader.onload=e=>{
     const result=parseCSV(e.target.result);
     if(result.error){ setMsg("err","⚠ "+result.error); document.getElementById("btnOk").disabled=true; return; }
-
-    // Preview table (first 5 data rows, first 10 cols)
     const showCols=result.cols.slice(0,10);
     const more=result.cols.length>10;
-    const previewRows=result.rawLines.slice(1,6).map(line=>{
+    const prev=result.rawLines.slice(1,6).map(line=>{
       const vals=line.split(result.sep);
       const obj={}; result.cols.forEach((c,i)=>{ obj[c]=(vals[i]||"").trim(); });
       return obj;
     });
     document.getElementById("previewTable").innerHTML=
       `<thead><tr>${showCols.map(c=>`<th>${c}</th>`).join("")}${more?'<th>…</th>':''}</tr></thead>`+
-      `<tbody>${previewRows.map(r=>`<tr>${showCols.map(c=>`<td>${r[c]||""}</td>`).join("")}${more?'<td>…</td>':''}</tr>`).join("")}</tbody>`;
-    document.getElementById("previewCols").textContent=result.cols.length;
-    document.getElementById("previewRows").textContent=result.rows.length;
+      `<tbody>${prev.map(r=>`<tr>${showCols.map(c=>`<td>${r[c]||""}</td>`).join("")}${more?'<td>…</td>':''}</tr>`).join("")}</tbody>`;
+    document.getElementById("prevCols").textContent=result.cols.length;
+    document.getElementById("prevRows").textContent=result.rows.length;
     document.getElementById("previewWrap").classList.add("show");
-
     pendingData=result.rows;
     const cS=result.rows.filter(r=>r.regCode==="ขาย").length;
     const cM=result.rows.filter(r=>r.regCode==="จำนอง").length;
@@ -501,7 +610,6 @@ function handleFile(file){
   };
   reader.readAsText(file,"UTF-8");
 }
-
 function onFileSelect(e){ handleFile(e.target.files[0]); }
 function onDragOver(e){ e.preventDefault(); document.getElementById("dropZone").classList.add("drag-over"); }
 function onDragLeave(){ document.getElementById("dropZone").classList.remove("drag-over"); }
@@ -509,14 +617,32 @@ function onDrop(e){ e.preventDefault(); document.getElementById("dropZone").clas
 
 function confirmImport(){
   if(!pendingData||!pendingData.length) return;
-  DATA=pendingData; activeType=""; activeCondo=""; openIdx=-1;
+  DATA=pendingData; activeType=""; activeCondo=""; activeMonth=""; openIdx=-1; isImported=true;
   const names=[...new Set(DATA.map(d=>d.condo).filter(Boolean))];
   document.getElementById("headerSub").textContent=names.length<=2?names.join(" · "):names[0]+" และอื่น ๆ";
+  document.getElementById("btnClearData").classList.add("show");
   buildFilters(); render(); closeImport();
   showToast(`✔ นำเข้าสำเร็จ ${DATA.length} รายการ`);
 }
 
-/* ══ Init ══ */
+/* ══════════════════ CLEAR DATA ══════════════════ */
+function openConfirmClear(){ document.getElementById("modalConfirm").classList.add("show"); document.body.style.overflow="hidden"; }
+function closeConfirm(){ document.getElementById("modalConfirm").classList.remove("show"); document.body.style.overflow=""; }
+
+function executeClear(){
+  DATA=DEFAULT_DATA.map(d=>({...d}));
+  activeType=""; activeCondo=""; activeMonth=""; openIdx=-1; isImported=false;
+  document.getElementById("headerSub").textContent="บ้านเอื้ออาทร กระทุ่มแบน · สมุทรสาคร";
+  document.getElementById("search").value="";
+  document.getElementById("btnClearData").classList.remove("show");
+  buildFilters(); render(); closeConfirm();
+  showToast("🗑 ล้างข้อมูลแล้ว กลับสู่ข้อมูลตัวอย่าง");
+}
+
+/* ══════════════════ BACKDROP CLICK ══════════════════ */
+function backdropClick(e,id){ if(e.target===document.getElementById(id)){ if(id==="modalImport") closeImport(); else closeConfirm(); } }
+
+/* ══════════════════ INIT ══════════════════ */
 buildFilters();
 render();
 </script>
