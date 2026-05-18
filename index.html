@@ -103,12 +103,25 @@
   .card-date{font-size:11px;color:var(--text3);text-align:right}
   .chevron{color:var(--text3);font-size:14px;transition:transform .2s}
   .card.open .chevron{transform:rotate(180deg)}
+  .btn-copy{display:flex;align-items:center;justify-content:center;gap:4px;width:32px;height:32px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:white;color:var(--text2);cursor:pointer;transition:all .15s;flex-shrink:0;font-size:15px}
+  .btn-copy:hover{background:var(--accent-light);border-color:#b5ceea;color:var(--accent)}
+  .btn-copy.copied{background:#e8f5e9;border-color:#b5d9b5;color:#2a6a2a}
+  /* copy format options bar in detail footer */
+  .detail-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:10px 16px;border-top:1px solid var(--border);background:var(--surface2);grid-column:1/-1}
+  .copy-opt{display:flex;align-items:center;gap:4px;padding:5px 12px;border:1px solid var(--border2);border-radius:20px;background:white;font-family:'Sarabun',sans-serif;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s}
+  .copy-opt:hover{background:var(--accent-light);border-color:#b5ceea;color:var(--accent);font-weight:600}
+  .copy-opt-label{font-size:11px;color:var(--text3);margin-right:4px}
+  /* inline field copy button */
+  .drow-val-wrap{display:flex;align-items:center;gap:6px;justify-content:flex-end;flex:1;min-width:0}
+  .icopy{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid var(--border2);border-radius:5px;background:white;color:var(--text3);cursor:pointer;font-size:12px;flex-shrink:0;transition:all .12s;padding:0;line-height:1}
+  .icopy:hover{background:var(--accent-light);border-color:#b5ceea;color:var(--accent)}
+  .icopy.ok{background:#e8f5e9;border-color:#b5d9b5;color:#2a6a2a}
   .detail{display:none;border-top:1px solid var(--border);background:var(--surface2)}
-  .card.open .detail{display:grid;grid-template-columns:1fr 1fr 1fr}
+  .card.open .detail{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto}
   .detail-col{padding:14px 16px;border-right:1px solid var(--border)}
   .detail-col:last-child{border-right:none}
   .detail-title{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px}
-  .drow{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:13px;border-bottom:1px solid var(--border)}
+  .drow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px;border-bottom:1px solid var(--border)}
   .drow:last-child{border-bottom:none}
   .drow-label{color:var(--text2);flex-shrink:0;margin-right:8px}
   .drow-val{color:var(--text1);font-weight:500;text-align:right;word-break:break-word}
@@ -510,6 +523,7 @@ function render() {
         <div class="card-right">
           <span class="type-badge ${tcls(d.regCode)}">${d.regCode}</span>
           <div><div class="card-amt">${fmt(d.regAmt)} ฿</div><div class="card-date">${d.regDate||""}</div></div>
+          <button class="btn-copy" id="cpbtn${ri}" onclick="copyCard(${ri},event)" title="คัดลอกข้อมูล">📋</button>
           <span class="chevron">▼</span>
         </div>
       </div>
@@ -524,9 +538,9 @@ function render() {
         </div>
         <div class="detail-col">
           <div class="detail-title">👤 ข้อมูลเจ้าของ</div>
-          <div class="drow"><span class="drow-label">ชื่อ-นามสกุล</span><span class="drow-val">${d.ownTitle||""}${d.ownFname||""} ${d.ownLname||""}</span></div>
-          ${d.ownId?`<div class="drow"><span class="drow-label">เลขบัตร</span><span class="drow-val id-text">${d.ownId}</span></div>`:""}
-          ${d.ownTel?`<div class="drow"><span class="drow-label">โทรศัพท์</span><span class="drow-val">${d.ownTel}</span></div>`:""}
+          <div class="drow"><span class="drow-label">ชื่อ-นามสกุล</span><div class="drow-val-wrap"><span class="drow-val">${d.ownTitle||""}${d.ownFname||""} ${d.ownLname||""}</span><button class="icopy" id="ic_name_${ri}" onclick="iCopy('ic_name_${ri}','${((d.ownTitle||"")+(d.ownFname||"")+" "+(d.ownLname||"")).replace(/'/g,"\\'")}',event)" title="คัดลอกชื่อ">⎘</button></div></div>
+          ${d.ownId?`<div class="drow"><span class="drow-label">เลขบัตร</span><div class="drow-val-wrap"><span class="drow-val id-text">${d.ownId}</span><button class="icopy" id="ic_id_${ri}" onclick="iCopy('ic_id_${ri}','${d.ownId}',event)" title="คัดลอกเลขบัตร">⎘</button></div></div>`:""}
+          ${d.ownTel?`<div class="drow"><span class="drow-label">โทรศัพท์</span><div class="drow-val-wrap"><span class="drow-val">${d.ownTel}</span><button class="icopy" id="ic_tel_${ri}" onclick="iCopy('ic_tel_${ri}','${d.ownTel}',event)" title="คัดลอกเบอร์">⎘</button></div></div>`:""}
           <div class="drow"><span class="drow-label">ที่อยู่</span><span class="drow-val">${addr(d)}</span></div>
         </div>
         <div class="detail-col">
@@ -536,9 +550,127 @@ function render() {
           <div class="drow"><span class="drow-label">มูลค่า</span><span class="drow-val" style="font-weight:700">${fmt(d.regAmt)} บาท</span></div>
           ${d.ownProv?`<div class="drow"><span class="drow-label">จังหวัด</span><span class="drow-val">${d.ownProv}</span></div>`:""}
         </div>
+        <div class="detail-footer">
+          <span class="copy-opt-label">คัดลอกเป็น</span>
+          <button class="copy-opt" onclick="copyFormat(${ri},'text',event)">📄 ข้อความ</button>
+          <button class="copy-opt" onclick="copyFormat(${ri},'line',event)">💬 LINE / แชท</button>
+          <button class="copy-opt" onclick="copyFormat(${ri},'csv',event)">📊 CSV</button>
+        </div>
       </div>
     </div>`;
   }).join("");
+}
+
+/* ══════════════════ COPY FUNCTIONS ══════════════════ */
+function buildCopyText(d, mode) {
+  const name = (d.ownTitle||"") + (d.ownFname||"") + " " + (d.ownLname||"");
+  const addrStr = addr(d);
+  const cs = d.condo || "—";
+
+  if (mode === "text") {
+    const lines = [
+      "═══════════════════════════",
+      "  ข้อมูลนิติกรรมห้องชุด",
+      "═══════════════════════════",
+      "",
+      "【ข้อมูลห้องชุด】",
+      `  โครงการ          : ${cs}`,
+      d.bld   ? `  อาคาร            : ${d.bld}`   : "",
+      d.floor ? `  ชั้น             : ${d.floor}` : "",
+      `  เลขห้อง          : ${d.room || "—"}`,
+      d.area  ? `  พื้นที่          : ${d.area} ตร.ม.` : "",
+      "",
+      "【ข้อมูลเจ้าของ】",
+      `  ชื่อ-นามสกุล     : ${name}`,
+      d.ownId  ? `  เลขบัตรประชาชน  : ${d.ownId}`  : "",
+      d.ownTel ? `  โทรศัพท์        : ${d.ownTel}` : "",
+      addrStr !== "—" ? `  ที่อยู่          : ${addrStr}` : "",
+      "",
+      "【ข้อมูลนิติกรรม】",
+      `  ประเภท           : ${d.regCode}`,
+      d.regDate ? `  วันที่จดทะเบียน : ${d.regDate}` : "",
+      `  มูลค่า           : ${fmt(d.regAmt)} บาท`,
+      d.ownProv ? `  จังหวัดที่ตั้ง  : ${d.ownProv}` : "",
+      "",
+      "═══════════════════════════",
+    ].filter(l => l !== null && l !== undefined && !(l.trim()==="" && false));
+    return lines.filter(l=>l!==null).join("\n");
+  }
+
+  if (mode === "line") {
+    const lines = [
+      `🏢 *${cs}*`,
+      `🚪 ห้อง ${d.room||"—"}${d.bld?" · อาคาร "+d.bld:""}${d.floor?" · ชั้น "+d.floor:""}${d.area?" · "+d.area+" ตร.ม.":""}`,
+      "",
+      `👤 *${name}*`,
+      d.ownId  ? `🪪 ${d.ownId}` : "",
+      d.ownTel ? `📞 ${d.ownTel}` : "",
+      addrStr !== "—" ? `📍 ${addrStr}` : "",
+      "",
+      `📋 *${d.regCode}*`,
+      d.regDate ? `📅 ${d.regDate}` : "",
+      `💰 ${fmt(d.regAmt)} บาท`,
+    ].filter(l => l !== "");
+    return lines.join("\n");
+  }
+
+  if (mode === "csv") {
+    const header = "โครงการ,อาคาร,ชั้น,เลขห้อง,พื้นที่,คำนำหน้า,ชื่อ,นามสกุล,เลขบัตร,โทรศัพท์,ที่อยู่,ประเภทนิติกรรม,วันที่,มูลค่า";
+    const row = [
+      cs, d.bld||"", d.floor||"", d.room||"", d.area||"",
+      d.ownTitle||"", d.ownFname||"", d.ownLname||"",
+      d.ownId||"", d.ownTel||"", addrStr==="—"?"":addrStr,
+      d.regCode, d.regDate||"", d.regAmt
+    ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(",");
+    return header + "\n" + row;
+  }
+  return "";
+}
+
+async function doCopy(text, btnEl, label) {
+  try {
+    await navigator.clipboard.writeText(text);
+    if (btnEl) {
+      const orig = btnEl.innerHTML;
+      btnEl.innerHTML = "✔";
+      btnEl.classList.add("copied");
+      setTimeout(() => { btnEl.innerHTML = orig; btnEl.classList.remove("copied"); }, 1800);
+    }
+    showToast("✔ คัดลอกแล้ว" + (label ? " · " + label : ""));
+  } catch {
+    // fallback
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+    showToast("✔ คัดลอกแล้ว" + (label ? " · " + label : ""));
+  }
+}
+
+function copyCard(ri, e) {
+  e.stopPropagation();
+  const d = DATA[ri];
+  if (!d) return;
+  doCopy(buildCopyText(d, "line"), document.getElementById("cpbtn"+ri), "LINE / แชท");
+}
+
+function copyFormat(ri, mode, e) {
+  e.stopPropagation();
+  const d = DATA[ri];
+  if (!d) return;
+  const labels = { text:"ข้อความ", line:"LINE / แชท", csv:"CSV" };
+  doCopy(buildCopyText(d, mode), null, labels[mode]);
+}
+
+function iCopy(btnId, text, e) {
+  e.stopPropagation();
+  const btn = document.getElementById(btnId);
+  doCopy(text, null, "");
+  if (btn) {
+    btn.textContent = "✔";
+    btn.classList.add("ok");
+    setTimeout(() => { btn.textContent = "⎘"; btn.classList.remove("ok"); }, 1600);
+  }
 }
 
 /* ══════════════════ CSV PARSER ══════════════════ */
